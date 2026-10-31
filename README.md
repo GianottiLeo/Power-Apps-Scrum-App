@@ -2,7 +2,7 @@
 
 A Power Apps canvas app that replaced an Excel-based red/green KPI review for a manufacturing site's daily leadership meeting. Division leaders rate each KPI category, add comments and drill into the matching Power BI reports, **already filtered to their division**, without leaving the app.
 
-Built at **3M** for the San Luis Potosí (Mexico) site team, where it was used in their daily scrum meetings. Sensitive data has been removed from the screenshots.
+Built at **3M** for the San Luis Potosí (Mexico) site team, where it was used in their daily scrum meetings.
 
 ![Power Apps](https://img.shields.io/badge/Power%20Apps-742774?logo=powerapps&logoColor=white)
 ![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black)
@@ -21,9 +21,24 @@ Before each meeting, division leaders checked KPIs across several Power BI repor
 | **Division** | The division leader rates each category against criteria shown on screen, adds comments, and sees an embedded Power BI dashboard with historical status |
 | **Category** | Embedded Power BI reports for that metric, filtered to the selected division (or unfiltered for the whole site) |
 
-<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/42ddbe47-a81c-41f1-9705-ca09c275042a" width="640" alt="Home screen with red/green summary per division and category"></p>
-<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/5f176359-4eaf-4204-9c9e-60690fed653c" width="640" alt="Division screen with rating inputs, criteria and embedded history dashboard"></p>
-<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/ef0cdabf-4b82-48f3-9204-65a16e77bb28" width="640" alt="Category screen with an embedded Power BI report filtered by division"></p>
+### Site summary
+![Site summary: submitted, on-target and off-target counts, a division-by-category status grid, and today's escalations with leader comments](docs/images/app-home.png)
+
+### Division
+![Division screen: on/off-target toggle, criteria and comment box for each category, plus an embedded four-week status history](docs/images/app-division.png)
+
+### KPI reports
+![KPI reports screen: category tabs and an embedded Power BI report filtered to the selected division through the report URL](docs/images/app-category.png)
+
+> **Redesign mockup.** These screens keep the original app's structure and workflow with a cleaner design. Category names (Safety, Quality, Delivery, Cost, People), division names, comments and values are illustrative; the real app's data is internal to 3M. Source: [`docs/mockup/scrum-app.html`](docs/mockup/scrum-app.html).
+
+<details>
+<summary>Original app screens</summary>
+
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/42ddbe47-a81c-41f1-9705-ca09c275042a" width="640" alt="Original home screen"></p>
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/5f176359-4eaf-4204-9c9e-60690fed653c" width="640" alt="Original division screen"></p>
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/ef0cdabf-4b82-48f3-9204-65a16e77bb28" width="640" alt="Original category screen"></p>
+</details>
 
 ## The hard part: dynamic filters on embedded reports
 
@@ -35,4 +50,4 @@ I built formulas in Power Apps that map the selected button's text (for example 
 
 - Ratings, comments and history in one place instead of a spreadsheet.
 - Leaders could open the numbers behind each red/green call during the meeting itself.
-- The site team used it in their daily meetings for a period. It has since been retired, which is why the screenshots show empty inputs.
+- The site team used it in their daily meetings for a period. It has since been retired, which is why the original screenshots show empty inputs.

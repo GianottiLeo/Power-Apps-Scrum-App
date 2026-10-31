@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tier 4 Daily Review App</title>
+<style>
+  :root {
+    --canvas: #f3f2ef;
+    --surface-1: #fcfcfb;
+    --surface-2: #f7f6f3;
+    --border: #e4e2dd;
+    --grid: #ebe9e4;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #85837d;
+    --series-1: #2a78d6;
+    --seq-150: #b7d3f6;
+    --seq-300: #6da7ec;
+    --good: #0ca30c;
+    --critical: #d03b3b;
+    --brand: #742774;
+    --brand-2: #5a1d5a;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1600px; height: 900px; background: var(--canvas); font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: var(--text-primary); overflow: hidden; display: flex; flex-direction: column; }
+  .bar { background: var(--brand); color: #fff; height: 52px; padding: 0 20px; display: flex; align-items: center; gap: 14px; flex: none; }
+  .bar .app { font-weight: 650; font-size: 16px; }
+  .bar .site { color: #e3c9e3; font-size: 12.5px; border-left: 1px solid #9a5a9a; padding-left: 14px; }
+  .bar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 12.5px; }
+  .date { background: var(--brand-2); border: 1px solid #8e4a8e; border-radius: 6px; padding: 5px 10px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: #e9d5e9; color: var(--brand-2); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+  .wrap { flex: 1; display: flex; min-height: 0; }
+  nav { width: 208px; background: var(--surface-1); border-right: 1px solid var(--border); padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; flex: none; }
+  nav .sec { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin: 12px 8px 6px; }
+  nav a { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; color: var(--text-secondary); }
+  nav a.on { background: #f3e7f3; color: var(--brand-2); font-weight: 600; }
+  nav a .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: auto; }
+  main { flex: 1; padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  h1 { font-size: 20px; font-weight: 650; }
+  .sub { color: var(--text-secondary); font-size: 12.5px; margin-top: 2px; }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .card h2 { font-size: 13.5px; font-weight: 600; }
+  .hint { color: var(--text-muted); font-size: 11.5px; }
+  .btn { border-radius: 6px; padding: 7px 14px; font-weight: 600; font-size: 12.5px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
+  .btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .st { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+  .st svg { width: 12px; height: 12px; }
+  .g { color: #186d18; border-color: #bfe2bf; background: #eef8ee; }
+  .r { color: #a82c2c; border-color: #efc4c4; background: #fbeeee; }
+  .p { color: var(--text-muted); border-color: var(--border); background: var(--surface-2); border-style: dashed; }
+  .screen { display: none; flex: 1; min-height: 0; }
+  .screen.on { display: flex; }
+  table.matrix { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .matrix th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+  .matrix td { padding: 21px 10px; border-bottom: 1px solid var(--grid); }
+  .matrix td:first-child { font-weight: 600; }
+  .matrix .cmt { color: var(--text-muted); font-size: 11px; margin-left: 4px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .kpi .label { color: var(--text-secondary); font-size: 12px; } .kpi .value { font-size: 28px; font-weight: 650; margin-top: 2px; }
+  .esc { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+  .esc .item { border: 1px solid var(--border); border-left: 3px solid var(--critical); border-radius: 6px; padding: 9px 11px; background: var(--surface-2); }
+  .esc .meta { font-size: 11.5px; color: var(--text-muted); margin-bottom: 2px; }
+  .cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; flex: 1; min-height: 0; }
+  .cat { display: flex; flex-direction: column; gap: 10px; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; font-size: 12px; font-weight: 600; }
+  .seg div { padding: 7px 0; text-align: center; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .seg .gs { background: #eef8ee; color: #186d18; box-shadow: inset 0 0 0 1.5px #0ca30c; border-radius: 6px; }
+  .seg .rs { background: #fbeeee; color: #a82c2c; box-shadow: inset 0 0 0 1.5px #d03b3b; border-radius: 6px; }
+  .field label { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; margin-bottom: 4px; }
+  .ta { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; min-height: 86px; font-size: 12.5px; background: #fff; color: var(--text-primary); }
+  .ta.empty { color: var(--text-muted); font-style: italic; }
+  .crit { background: var(--surface-2); border: 1px solid var(--grid); border-radius: 6px; padding: 8px 10px; font-size: 12px; color: var(--text-secondary); }
+  .crit b { color: var(--text-primary); }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); }
+  .tabs div { padding: 9px 16px; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; display: flex; gap: 6px; align-items: center; }
+  .tabs .on { color: var(--brand-2); border-color: var(--brand); }
+  .embed { flex: 1; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; background: #fff; overflow: hidden; }
+  .embed .eh { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--grid); background: var(--surface-2); font-size: 12px; color: var(--text-secondary); }
+  .pbi { width: 16px; height: 16px; display: inline-flex; gap: 2px; align-items: flex-end; }
+  .pbi i { display: block; width: 4px; border-radius: 1px; background: #f2c811; } .pbi i:nth-child(1){height:7px;opacity:.6} .pbi i:nth-child(2){height:11px;opacity:.8} .pbi i:nth-child(3){height:16px}
+  code { font-family: Consolas, monospace; font-size: 11.5px; background: #fff; border: 1px solid var(--grid); border-radius: 4px; padding: 2px 6px; color: var(--text-primary); }
+  .filterpill { margin-left: auto; background: #e9f1fc; color: #1c5cab; border: 1px solid var(--seq-150); border-radius: 99px; padding: 2px 10px; font-weight: 600; }
+  svg text { font-family: "Segoe UI", system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="app">Tier 4 Daily Review</div>
+  <div class="site">San Luis Potosí plant · Leadership meeting</div>
+  <div class="right"><span class="date">📅 Wed, 27 Mar 2024</span><span>Site leader view</span><div class="avatar">SL</div></div>
+</div>
+<div class="wrap">
+  <nav>
+    <a id="nav-home">⌂&nbsp; Site summary</a>
+    <div class="sec">Divisions</div>
+    <a id="nav-d1">Division 1 · Converting<span class="dot" style="background:var(--critical)"></span></a>
+    <a>Division 2 · Coating<span class="dot" style="background:var(--good)"></span></a>
+    <a>Division 3 · Assembly<span class="dot" style="background:var(--critical)"></span></a>
+    <a>Division 4 · Packaging<span class="dot" style="background:var(--good)"></span></a>
+    <a>Division 5 · Warehouse<span class="dot" style="background:var(--text-muted)"></span></a>
+    <div class="sec">Reports</div>
+    <a id="nav-cat">▦&nbsp; KPI reports</a>
+  </nav>
+  <main>
+    <!-- HOME -->
+    <section class="screen" id="home" style="flex-direction:column;gap:14px">
+      <div class="head"><div><h1>Site summary</h1><div class="sub">Red/green status submitted by each division leader before the meeting</div></div><div style="display:flex;gap:8px"><span class="btn">◀ Previous day</span><span class="btn primary">Start meeting</span></div></div>
+      <div class="kpis">
+        <div class="card kpi"><div class="label">Statuses submitted</div><div class="value">20 <span style="font-size:15px;color:var(--text-muted)">/ 25</span></div></div>
+        <div class="card kpi"><div class="label">On target</div><div class="value" style="color:#186d18">16</div></div>
+        <div class="card kpi"><div class="label">Off target</div><div class="value" style="color:#a82c2c">4</div></div>
+        <div class="card kpi"><div class="label">Reds open 3+ days</div><div class="value">2</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:14px;flex:1;min-height:0">
+        <div class="card"><h2>Status by division and category</h2><div class="hint">Select a cell to open the division's detail and comments</div><table class="matrix" id="matrix" style="margin-top:6px"></table></div>
+        <div class="card"><h2>Escalations for today</h2><div class="hint">Off-target categories with leader comments</div><div class="esc" id="esc"></div></div>
+      </div>
+    </section>
+
+    <!-- DIVISION -->
+    <section class="screen" id="division" style="flex-direction:column;gap:14px">
+      <div class="head"><div><h1>Division 1 · Converting</h1><div class="sub">Rate each category against its criteria, add context, then save before the meeting</div></div><div style="display:flex;gap:8px;align-items:center"><span class="hint">Last saved 07:42 by M. Hernández</span><span class="btn">Open KPI reports</span><span class="btn primary">Save statuses</span></div></div>
+      <div class="cats" id="cats"></div>
+      <div class="card" style="flex:none"><div style="display:flex;justify-content:space-between;align-items:baseline"><div><h2>Last 4 weeks</h2><div class="hint">Embedded Power BI history for Division 1 · each square is one daily status</div></div><span class="hint"><span style="color:var(--good);opacity:.6">■</span> on target&nbsp;&nbsp;<span style="color:var(--critical)">■</span> off target</span></div><svg id="history" width="100%" height="146"></svg></div>
+    </section>
+
+    <!-- CATEGORY -->
+    <section class="screen" id="category" style="flex-direction:column;gap:12px">
+      <div class="head"><div><h1>KPI reports</h1><div class="sub">The Power BI report behind each category, filtered to the selected division</div></div><div style="display:flex;gap:8px"><span class="btn">Division 1 · Converting ▾</span></div></div>
+      <div class="tabs"><div>Safety</div><div class="on">Quality</div><div>Delivery</div><div>Cost</div><div>People</div></div>
+      <div class="embed">
+        <div class="eh"><span class="pbi"><i></i><i></i><i></i></span><b style="color:var(--text-primary)">Quality · First-pass yield</b><code>…/ReportSection3?filter=Divisions/Name eq 'Converting'</code><span class="filterpill">Filtered: Division = Converting</span></div>
+        <div style="flex:1;display:grid;grid-template-columns:240px 1fr;gap:0;min-height:0">
+          <div style="padding:16px;border-right:1px solid var(--grid);display:flex;flex-direction:column;gap:14px">
+            <div class="kpi"><div class="label">First-pass yield, today</div><div class="value">94.1%</div><div class="hint">target ≥ 96.0%</div></div>
+            <div class="kpi"><div class="label">Scrap, today</div><div class="value">412 <span style="font-size:14px;color:var(--text-muted)">kg</span></div><div class="hint">target ≤ 300 kg</div></div>
+            <div class="kpi"><div class="label">Customer complaints, MTD</div><div class="value">1</div><div class="hint">target 0</div></div>
+          </div>
+          <div style="padding:14px 18px;display:flex;flex-direction:column"><b>First-pass yield by day</b><span class="hint">Last 30 days · dashed line = 96% target</span><svg id="fpy" width="100%" style="flex:1"></svg></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+const page = location.hash.slice(1) || 'home';
+document.getElementById(page).classList.add('on');
+document.getElementById({ home: 'nav-home', division: 'nav-d1', category: 'nav-cat' }[page]).classList.add('on');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = 'http://www.w3.org/2000/svg';
+function el(svg, tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+function size(svg) { const r = svg.getBoundingClientRect(); return [r.width, r.height]; }
+const ICON = { g: '<svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+               r: '<svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+               p: '<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2 2"/></svg>' };
+const LBL = { g: 'On target', r: 'Off target', p: 'Pending' };
+const pill = s => `<span class="st ${s}">${ICON[s]}${LBL[s]}</span>`;
+const CATS = ['Safety', 'Quality', 'Delivery', 'Cost', 'People'];
+
+if (page === 'home') {
+  const divs = [['Division 1 · Converting', 'grggg', [0, 2, 0, 0, 0]], ['Division 2 · Coating', 'ggggg', [0, 0, 0, 0, 0]], ['Division 3 · Assembly', 'ggrrg', [0, 0, 1, 3, 0]], ['Division 4 · Packaging', 'gggrg', [0, 0, 0, 1, 0]], ['Division 5 · Warehouse', 'ppppp', [0, 0, 0, 0, 0]]];
+  let h = '<tr><th>Division</th>' + CATS.map(c => `<th>${c}</th>`).join('') + '</tr>';
+  for (const [d, s, c] of divs) h += `<tr><td>${d}</td>` + [...s].map((x, i) => `<td>${pill(x)}${c[i] ? `<span class="cmt">💬 ${c[i]}</span>` : ''}</td>`).join('') + '</tr>';
+  document.getElementById('matrix').innerHTML = h;
+  const esc = [['Division 1 · Quality', 'Day 3', 'FPY at 94.1% on line C2. Splice defects after die change; maintenance checking the unwind tension.'], ['Division 3 · Delivery', 'Day 1', 'Two orders at risk for Friday. Short on corrugated boxes; supplier ETA tomorrow 10:00.'], ['Division 3 · Cost', 'Day 4', 'Overtime 18% over plan while training the new shift.'], ['Division 4 · Cost', 'Day 1', 'Expedited freight for a key customer, approved by the site leader.']];
+  document.getElementById('esc').innerHTML = esc.map(([t, d, c]) => `<div class="item"><div class="meta"><b style="color:var(--text-primary)">${t}</b> · red ${d}</div>${c}</div>`).join('');
+}
+
+if (page === 'division') {
+  const data = [
+    ['Safety', 'g', 'Red if any recordable injury or open high-risk near miss in the last 24 h.', 'No incidents. Lockout audit on line C1 completed, 0 findings.'],
+    ['Quality', 'r', 'Red if first-pass yield < 96% or any customer complaint.', 'FPY at 94.1% on line C2. Splice defects after the die change; maintenance checking unwind tension. Containment in place.'],
+    ['Delivery', 'g', 'Red if any order ships late or is at risk in the next 48 h.', 'All orders on time. OTIF 99.2% week to date.'],
+    ['Cost', 'g', 'Red if scrap > 300 kg/day or overtime > 10% of plan.', ''],
+    ['People', 'g', 'Red if absenteeism > 5% or a critical role is uncovered.', 'Absenteeism 2.8%. Two operators in cross-training.']];
+  document.getElementById('cats').innerHTML = data.map(([c, s, crit, cm]) => `<div class="card cat"><div style="display:flex;justify-content:space-between;align-items:center"><h2>${c}</h2><span class="hint">${cm ? '💬' : ''}</span></div>
+    <div class="seg"><div class="${s === 'g' ? 'gs' : ''}">${ICON.g.replace('<svg', '<svg width="12" height="12"')} On target</div><div class="${s === 'r' ? 'rs' : ''}">${ICON.r.replace('<svg', '<svg width="12" height="12"')} Off target</div></div>
+    <div class="field"><label>Criteria</label><div class="crit">${crit}</div></div>
+    <div class="field" style="flex:1;display:flex;flex-direction:column"><label>Comment</label><div class="ta ${cm ? '' : 'empty'}" style="flex:1">${cm || 'Add context for the site leader…'}</div></div></div>`).join('');
+  const svg = document.getElementById('history'); const [W] = size(svg);
+  const pat = ['ggggggggggggggggggggg', 'gggggrgggggggggggrrr', 'ggggggggrrggggggggggg', 'gggggggggggggggggggg', 'ggggggggggggggggggggg'];
+  const lw = 76, cols = 20, gap = 4, cw = (W - lw - 10) / cols - gap, ch = 22;
+  CATS.forEach((c, r) => { const y = 4 + r * (ch + 6); el(svg, 'text', { x: 0, y: y + 15,'font-size': 11.5, fill: css('--text-secondary') }, c);
+    for (let i = 0; i < cols; i++) { const s = (pat[r][i] || 'g') === 'r'; el(svg, 'rect', { x: lw + i * (cw + gap), y, width: cw, height: ch, rx: 3, fill: s ? css('--critical') : css('--good'), opacity: s ? 1 : .55 }); } });
+}
+
+if (page === 'category') {
+  const svg = document.getElementById('fpy'); const [W, H] = size(svg);
+  const m = { l: 40, r: 10, t: 14, b: 24 }, iw = W - m.l - m.r, ih = H - m.t - m.b, lo = 92, hi = 99;
+  const sy = v => m.t + (hi - v) / (hi - lo) * ih, n = 30, sx = i => m.l + i / (n - 1) * iw;
+  [92, 94, 96, 98].forEach(v => { el(svg, 'line', { x1: m.l, x2: W - m.r, y1: sy(v), y2: sy(v), stroke: css('--grid') }); el(svg, 'text', { x: m.l - 8, y: sy(v) + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: css('--text-muted') }, v + '%'); });
+  el(svg, 'line', { x1: m.l, x2: W - m.r, y1: sy(96), y2: sy(96), stroke: css('--text-muted'), 'stroke-dasharray': '5 4', 'stroke-width': 1.5 });
+  let s = 11; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const d = Array.from({ length: n }, (_, i) => i < 27 ? 96.8 + (r() - .5) * 1.6 : [95.2, 94.6, 94.1][i - 27]);
+  el(svg, 'path', { d: 'M' + d.map((v, i) => `${sx(i).toFixed(1)},${sy(v).toFixed(1)}`).join('L'), fill: 'none', stroke: css('--series-1'), 'stroke-width': 2 });
+  d.forEach((v, i) => { if (v < 96) el(svg, 'circle', { cx: sx(i), cy: sy(v), r: 4.5, fill: css('--critical'), stroke: '#fff', 'stroke-width': 2 }); });
+  el(svg, 'text', { x: sx(29) - 8, y: sy(94.1) + 18, 'text-anchor': 'end', 'font-size': 11.5, 'font-weight': 600, fill: '#a82c2c' }, 'Today 94.1%');
+  ['1 Mar', '8 Mar', '15 Mar', '22 Mar', '27 Mar'].forEach((t, k) => el(svg, 'text', { x: sx([0, 7, 14, 21, 26][k]), y: H - 6, 'text-anchor': 'middle', 'font-size': 10.5, fill: css('--text-muted') }, t));
+}
+</script>
+</body>
+</html>
