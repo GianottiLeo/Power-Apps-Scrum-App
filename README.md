@@ -1,28 +1,38 @@
-# Power-Apps-Scrum-App
+# Daily Scrum KPI App (Power Apps + embedded Power BI)
 
-This is a app created by me in my current job. It was used by the team from San Luis Potosi region for a while to organize their daily scrum meetings. Before the app creation, they had a red and green classification, done in a Excel sheet by the division leaders before the each meeting with the site leader, after making KPIs evaluations in multiple Power Bi Reports. The requiriment was to create a app so that they could still do the red and green classification, but were able to add comments, see the past weeks status easily and check the reports on it as well. My idea to create the solution was a Power Apps App, with capability for the user to navigate between multiple categories and that way, check each necessary report embeded. I had to remove some info, since it's sensitive data, but here are some images of the app and what's possible to do in each one of them
-#
+A Power Apps canvas app that replaced an Excel-based red/green KPI review for a manufacturing site's daily leadership meeting. Division leaders rate each KPI category, add comments and drill into the matching Power BI reports, **already filtered to their division**, without leaving the app.
 
-<p align="center">
-<img width="12" />
-<img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/42ddbe47-a81c-41f1-9705-ca09c275042a" height="360" alt="powerbi logo" width ="630"  />
-  
-###
+Built at **3M** for the San Luis Potosí (Mexico) site team, where it was used in their daily scrum meetings. Sensitive data has been removed from the screenshots.
 
-This is the first page, where the we can see multiple empty boxes (since the app is not used anymore) that after filled, presents the user a summary of all the red and green classifications for the current day. To check the input in more detail, it's possible to navigate by gray buttons to each division or category. As you will be able to see in the next images, clicking in a category the user is directed to a page to check the PBI Reports under that metric and clicking in a division, to the page where he can check in more details the inputs from the division]
-#
-<p align="center">
-<img width="12" />
-<img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/5f176359-4eaf-4204-9c9e-60690fed653c" height="360" alt="powerbi logo" width ="630"  />
-  
-###
-This image is the page the user is directed after clicking the division 1 button. Here, the divison 1 leader is suppoused (after analysing each corresponded PBI) to classify each category as red or green and enter comments if necessary (in the white boxes, following the criteria defined in the orange boxes). It's also possible to check the historical data in a PBI Dashboard embeded in the green box. The site leader can check all that as well during the daily meeting
-#
+![Power Apps](https://img.shields.io/badge/Power%20Apps-742774?logo=powerapps&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?logo=powerbi&logoColor=black)
 
-<p align="center">
-<img width="12" />
-<img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/ef0cdabf-4b82-48f3-9204-65a16e77bb28" height="360" alt="powerbi logo" width ="630"  />
+## The problem
 
-###
-Lastly, this image shows a example of the category pages. In each one of them, the corresponded PBI Reports will be shown, already filtered by the division selected (in the image, it is filtered but it's possible of course to see the reports without filtering, to check the whole site). This was the hardest step to do, since I needed to create a dinamic filter in a embeded report by the text in the button selected. I tried multiple approaches, but the one that worked was studing URL enconding and creating dinamic measures inside Power Apps that would translate the selected text (Division 1, in this example) to the corresponded name of the measures in the report, but encoded like they appear in the URL filtering the page
+Before each meeting, division leaders checked KPIs across several Power BI reports and then typed a red/green status into a shared Excel sheet for the site leader. The sheet had no comments, no history and no link back to the numbers behind each rating.
 
+**Requirements:** keep the familiar red/green rating, add comments, show the past weeks' status, and put the supporting reports one click away.
+
+## Solution
+
+| Screen | What it does |
+|---|---|
+| **Home** | Today's red/green summary across all divisions and categories, with navigation to each division or category |
+| **Division** | The division leader rates each category against criteria shown on screen, adds comments, and sees an embedded Power BI dashboard with historical status |
+| **Category** | Embedded Power BI reports for that metric, filtered to the selected division (or unfiltered for the whole site) |
+
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/42ddbe47-a81c-41f1-9705-ca09c275042a" width="640" alt="Home screen with red/green summary per division and category"></p>
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/5f176359-4eaf-4204-9c9e-60690fed653c" width="640" alt="Division screen with rating inputs, criteria and embedded history dashboard"></p>
+<p align="center"><img src="https://github.com/GianottiLeo/Power-Apps-Scrum-App/assets/164948682/ef0cdabf-4b82-48f3-9204-65a16e77bb28" width="640" alt="Category screen with an embedded Power BI report filtered by division"></p>
+
+## The hard part: dynamic filters on embedded reports
+
+Power Apps can embed a Power BI report, but it can't pass it a filter based on which button the user clicked. The filter has to go in the report URL instead (`?filter=Table/Field eq 'Value'`), using Power BI's URL-encoded names for tables, fields and values.
+
+I built formulas in Power Apps that map the selected button's text (for example "Division 1") to the matching field name in the report, URL-encode it, and assemble the filtered embed URL at runtime. One report then serves every division, with no duplicate pages to maintain.
+
+## Outcome
+
+- Ratings, comments and history in one place instead of a spreadsheet.
+- Leaders could open the numbers behind each red/green call during the meeting itself.
+- The site team used it in their daily meetings for a period. It has since been retired, which is why the screenshots show empty inputs.
